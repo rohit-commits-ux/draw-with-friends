@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Draw With Friends - Collaborative Drawing App</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎨 Draw With Friends</h1>
+            <p>Create amazing art together in real-time!</p>
+        </header>
+        
+        <div class="mode-selection">
+            <div class="mode-card" onclick="window.location.href='/singleplayer'">
+                <h2>🎯 Single Player</h2>
+                <p>Practice your drawing skills alone</p>
+                <div class="mode-features">
+                    <span>✓ Unlimited canvas</span>
+                    <span>✓ Multiple brushes</span>
+                    <span>✓ Save your work</span>
+                </div>
+            </div>
+            
+            <div class="mode-card" onclick="window.location.href='/multiplayer'">
+                <h2>👥 Multiplayer</h2>
+                <p>Draw with friends in real-time</p>
+                <div class="mode-features">
+                    <span>✓ Real-time sync</span>
+                    <span>✓ Multiple rooms</span>
+                    <span>✓ Chat with friends</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="features">
+            <h3>🚀 Amazing Features:</h3>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <span class="feature-icon">🖌️</span>
+                    <h4>Multiple Brush Sizes</h4>
+                    <p>From fine lines to bold strokes</p>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">🎨</span>
+                    <h4>Color Palette</h4>
+                    <p>Choose from millions of colors</p>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">⚡</span>
+                    <h4>Real-time Sync</h4>
+                    <p>See others draw instantly</p>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">📱</span>
+                    <h4>Mobile Friendly</h4>
+                    <p>Works on all devices</p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Built with ❤️ using Socket.io & HTML5 Canvas</p>
+        </footer>
+    </div>
+
+    <script>
+        // Add some interactive effects
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.mode-card');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-10px) scale(1.05)';
+                });
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
