@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choose Mode - Draw With Friends</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        .mode-selection {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin: 60px 0;
+            flex-wrap: wrap;
+        }
+        
+        .mode-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            min-width: 300px;
+            border: 3px solid transparent;
+        }
+        
+        .mode-card:hover {
+            transform: translateY(-15px) scale(1.05);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+            border-color: #667eea;
+        }
+        
+        .mode-card.singleplayer:hover {
+            border-color: #27ae60;
+        }
+        
+        .mode-card.multiplayer:hover {
+            border-color: #667eea;
+        }
+        
+        .mode-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+        
+        .mode-card h2 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 1.8em;
+        }
+        
+        .mode-card p {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        .mode-features {
+            text-align: left;
+            margin-top: 20px;
+        }
+        
+        .mode-features span {
+            display: block;
+            padding: 5px 0;
+            color: #555;
+        }
+        
+        .mode-features span:before {
+            content: "✓ ";
+            color: #27ae60;
+            font-weight: bold;
+        }
+        
+        .back-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎮 Choose Your Drawing Mode</h1>
+            <p>Select how you want to draw</p>
+        </header>
+        
+        <div class="mode-selection">
+            <div class="mode-card singleplayer" onclick="window.location.href='/singleplayer'">
+                <div class="mode-icon">🎯</div>
+                <h2>Single Player</h2>
+                <p>Practice and create amazing art by yourself. Perfect for learning and personal projects.</p>
+                <div class="mode-features">
+                    <span>Unlimited canvas space</span>
+                    <span>Multiple brush sizes & colors</span>
+                    <span>Save your artwork</span>
+                    <span>No distractions</span>
+                    <span>Perfect for practice</span>
+                </div>
+            </div>
+            
+            <div class="mode-card multiplayer" onclick="window.location.href='/multiplayer'">
+                <div class="mode-icon">👥</div>
+                <h2>Multiplayer</h2>
+                <p>Collaborate with friends in real-time. Create art together from different devices.</p>
+                <div class="mode-features">
+                    <span>Real-time synchronization</span>
+                    <span>Multiple rooms support</span>
+                    <span>Chat with collaborators</span>
+                    <span>See others draw live</span>
+                    <span>Perfect for teamwork</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="back-container">
+            <a href="/" class="back-btn">← Back to Home</a>
+        </div>
+
+        <div class="features" style="margin-top: 50px;">
+            <h3>🌟 Why Choose Our Drawing App?</h3>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <span class="feature-icon">🚀</span>
+                    <h4>Lightning Fast</h4>
+                    <p>Real-time updates with no lag</p>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">🎨</span>
+                    <h4>Creative Freedom</h4>
+                    <p>Unleash your creativity with advanced tools</p>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">🌐</span>
+                    <h4>Accessible Anywhere</h4>
+                    <p>Works on all devices and browsers</p>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">🔒</span>
+                    <h4>No Registration</h4>
+                    <p>Start drawing immediately, no sign-up required</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add interactive effects
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.mode-card');
+            
+            cards.forEach((card, index) => {
+                // Add entrance animation
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(50px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'all 0.6s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 200);
+                
+                // Add click effect
+                card.addEventListener('click', function() {
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        window.location.href = this === cards[0] ? '/singleplayer' : '/multiplayer';
+                    }, 150);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

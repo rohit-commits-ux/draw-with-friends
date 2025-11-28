@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiplayer - Draw With Friends</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>👥 Multiplayer Mode</h1>
+            <div class="header-controls">
+                <a href="/" class="back-btn">← Back to Home</a>
+                <div class="room-info">
+                    <input type="text" id="roomIdInput" placeholder="Enter room ID" value="default-room">
+                    <button id="joinRoomBtn" class="btn btn-primary">🎮 Join Room</button>
+                    <button id="createRoomBtn" class="btn btn-success">✨ Create New Room</button>
+                    <span id="userCount">👤 Users: 1</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="multiplayer-container">
+            <div class="sidebar">
+                <div class="tools-panel">
+                    <h3>🎨 Drawing Tools</h3>
+                    
+                    <div class="tool-group">
+                        <label>🖌️ Brush Size: <span id="brushSizeValue">5px</span></label>
+                        <input type="range" id="brushSize" min="1" max="50" value="5" class="slider">
+                    </div>
+                    
+                    <div class="tool-group">
+                        <label>🎨 Color:</label>
+                        <input type="color" id="colorPicker" value="#000000">
+                        <div class="color-presets">
+                            <div class="color-preset" style="background: #000000;" data-color="#000000"></div>
+                            <div class="color-preset" style="background: #ff0000;" data-color="#ff0000"></div>
+                            <div class="color-preset" style="background: #00ff00;" data-color="#00ff00"></div>
+                            <div class="color-preset" style="background: #0000ff;" data-color="#0000ff"></div>
+                            <div class="color-preset" style="background: #ffff00;" data-color="#ffff00"></div>
+                            <div class="color-preset" style="background: #ff00ff;" data-color="#ff00ff"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button id="clearBtn" class="btn btn-danger">🧹 Clear Canvas</button>
+                        <button id="saveBtn" class="btn btn-success">💾 Save Drawing</button>
+                    </div>
+                </div>
+
+                <div class="users-panel">
+                    <h3>👥 Active Users <span id="usersCount">(1)</span></h3>
+                    <ul id="usersList">
+                        <li>You (Host)</li>
+                    </ul>
+                </div>
+
+                <div class="chat-panel">
+                    <h3>💬 Chat</h3>
+                    <div id="chatMessages" class="chat-messages">
+                        <div class="system-message">Welcome to the drawing room! Start chatting with others.</div>
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" id="chatInput" placeholder="Type a message...">
+                        <button id="sendBtn" class="btn btn-primary">Send</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="main-content">
+                <div class="canvas-wrapper">
+                    <canvas id="drawingCanvas" width="800" height="600"></canvas>
+                    <div id="connectionStatus" class="status-connected">🟢 Connected</div>
+                    <div class="room-info-display">
+                        <span id="currentRoom">Room: default-room</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="assets/js/canvas.js"></script>
+    <script src="assets/js/multiplayer.js"></script>
+    <script>
+        // Additional multiplayer initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            // Generate random room ID for create button
+            document.getElementById('createRoomBtn').addEventListener('click', function() {
+                const randomId = Math.random().toString(36).substring(2, 8).toUpperCase();
+                document.getElementById('roomIdInput').value = randomId;
+                if (window.multiplayerManager) {
+                    window.multiplayerManager.joinRoom();
+                }
+            });
+            
+            // Chat functionality
+            const chatInput = document.getElementById('chatInput');
+            const sendBtn = document.getElementById('sendBtn');
+            const chatMessages = document.getElementById('chatMessages');
+            
+            function sendMessage() {
+                const message = chatInput.value.trim();
+                if (message && window.multiplayerManager) {
+                    window.multiplayerManager.socket.emit('chat-message', {
+                        roomId: window.multiplayerManager.roomId,
+                        message: message,
+                        username: 'You'
+                    });
+                    chatInput.value = '';
+                }
+            }
+            
+            sendBtn.addEventListener('click', sendMessage);
+            chatInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+            
+            // Listen for chat messages
+            if (window.multiplayerManager) {
+                window.multiplayerManager.socket.on('chat-message', (data) => {
+                    const messageElement = document.createElement('div');
+                    messageElement.className = 'chat-message';
+                    messageElement.innerHTML = `
+                        <strong>${data.username}:</strong> ${data.message}
+                        <span class="message-time">${data.timestamp}</span>
+                    `;
+                    chatMessages.appendChild(messageElement);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                });
+            }
+        });
+    </script>
+</body>
+</html>

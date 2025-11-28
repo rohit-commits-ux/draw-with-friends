@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Single Player - Draw With Friends</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎯 Single Player Mode</h1>
+            <div class="header-controls">
+                <a href="/" class="back-btn">← Back to Home</a>
+                <div class="drawing-info">
+                    <span id="drawingStats">Brush: 5px | Color: #000000</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="drawing-container">
+            <div class="tools-panel">
+                <h3>Drawing Tools</h3>
+                
+                <div class="tool-group">
+                    <label>🖌️ Brush Size: <span id="brushSizeValue">5px</span></label>
+                    <input type="range" id="brushSize" min="1" max="50" value="5" class="slider">
+                </div>
+                
+                <div class="tool-group">
+                    <label>🎨 Color:</label>
+                    <input type="color" id="colorPicker" value="#000000">
+                    <div class="color-presets">
+                        <div class="color-preset" style="background: #000000;" data-color="#000000"></div>
+                        <div class="color-preset" style="background: #ff0000;" data-color="#ff0000"></div>
+                        <div class="color-preset" style="background: #00ff00;" data-color="#00ff00"></div>
+                        <div class="color-preset" style="background: #0000ff;" data-color="#0000ff"></div>
+                        <div class="color-preset" style="background: #ffff00;" data-color="#ffff00"></div>
+                        <div class="color-preset" style="background: #ff00ff;" data-color="#ff00ff"></div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button id="clearBtn" class="btn btn-danger">🧹 Clear Canvas</button>
+                    <button id="saveBtn" class="btn btn-success">💾 Save Drawing</button>
+                    <button id="undoBtn" class="btn btn-secondary">↶ Undo</button>
+                </div>
+
+                <div class="tips">
+                    <h4>💡 Tips:</h4>
+                    <ul>
+                        <li>Click and drag to draw</li>
+                        <li>Use touch on mobile devices</li>
+                        <li>Change brush size for different effects</li>
+                        <li>Try different colors for creative art</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="canvas-wrapper">
+                <canvas id="drawingCanvas" width="800" height="600"></canvas>
+                <div class="canvas-overlay" id="canvasOverlay">
+                    <p>Start drawing here!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/js/canvas.js"></script>
+    <script>
+        // Initialize single player canvas
+        document.addEventListener('DOMContentLoaded', function() {
+            window.canvas = new DrawingCanvas('single');
+            
+            // Update drawing stats
+            const updateStats = () => {
+                const stats = document.getElementById('drawingStats');
+                if (stats) {
+                    stats.textContent = `Brush: ${window.canvas.brushSize}px | Color: ${window.canvas.color}`;
+                }
+            };
+            
+            // Update stats when tools change
+            document.getElementById('brushSize').addEventListener('input', updateStats);
+            document.getElementById('colorPicker').addEventListener('input', updateStats);
+            updateStats();
+            
+            // Color presets
+            document.querySelectorAll('.color-preset').forEach(preset => {
+                preset.addEventListener('click', function() {
+                    const color = this.getAttribute('data-color');
+                    document.getElementById('colorPicker').value = color;
+                    window.canvas.color = color;
+                    window.canvas.ctx.strokeStyle = color;
+                    updateStats();
+                });
+            });
+            
+            // Save drawing button
+            document.getElementById('saveBtn').addEventListener('click', function() {
+                const canvas = document.getElementById('drawingCanvas');
+                const link = document.createElement('a');
+                link.download = 'my-drawing.png';
+                link.href = canvas.toDataURL();
+                link.click();
+                alert('🎉 Drawing saved!');
+            });
+            
+            // Canvas overlay
+            const canvasOverlay = document.getElementById('canvasOverlay');
+            if (canvasOverlay) {
+                document.getElementById('drawingCanvas').addEventListener('mousedown', function() {
+                    canvasOverlay.style.display = 'none';
+                });
+            }
+        });
+    </script>
+</body>
+</html>
