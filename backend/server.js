@@ -22,9 +22,13 @@ app.use(express.static(path.join(__dirname, '../frontend/public')));
 const rooms = new Map();
 const drawings = new Map();
 
-// Serve main pages
+// Serve main pages - LOGIN PAGE IS NOW FIRST
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/public/index.html'));
+});
+
+app.get('/mode', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/public/mode.html'));
 });
 
 app.get('/multiplayer', (req, res) => {
@@ -33,10 +37,6 @@ app.get('/multiplayer', (req, res) => {
 
 app.get('/singleplayer', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/public/singleplayer.html'));
-});
-
-app.get('/mode', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/public/mode.html'));
 });
 
 // API route for health check
