@@ -20,7 +20,7 @@
             border-radius: 20px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.4s ease;
             box-shadow: 0 15px 35px rgba(0,0,0,0.1);
             min-width: 300px;
             border: 3px solid transparent;
@@ -29,7 +29,6 @@
         .mode-card:hover {
             transform: translateY(-15px) scale(1.05);
             box-shadow: 0 25px 50px rgba(0,0,0,0.2);
-            border-color: #667eea;
         }
         
         .mode-card.singleplayer:hover {
@@ -74,6 +73,13 @@
             font-weight: bold;
         }
         
+        .user-welcome {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+            font-size: 1.2em;
+        }
+        
         .back-container {
             text-align: center;
             margin-top: 30px;
@@ -84,6 +90,9 @@
     <div class="container">
         <header>
             <h1>🎮 Choose Your Drawing Mode</h1>
+            <div class="user-welcome" id="userWelcome">
+                Welcome, Player!
+            </div>
             <p>Select how you want to draw</p>
         </header>
         
@@ -116,39 +125,16 @@
         </div>
 
         <div class="back-container">
-            <a href="/" class="back-btn">← Back to Home</a>
-        </div>
-
-        <div class="features" style="margin-top: 50px;">
-            <h3>🌟 Why Choose Our Drawing App?</h3>
-            <div class="features-grid">
-                <div class="feature-item">
-                    <span class="feature-icon">🚀</span>
-                    <h4>Lightning Fast</h4>
-                    <p>Real-time updates with no lag</p>
-                </div>
-                <div class="feature-item">
-                    <span class="feature-icon">🎨</span>
-                    <h4>Creative Freedom</h4>
-                    <p>Unleash your creativity with advanced tools</p>
-                </div>
-                <div class="feature-item">
-                    <span class="feature-icon">🌐</span>
-                    <h4>Accessible Anywhere</h4>
-                    <p>Works on all devices and browsers</p>
-                </div>
-                <div class="feature-item">
-                    <span class="feature-icon">🔒</span>
-                    <h4>No Registration</h4>
-                    <p>Start drawing immediately, no sign-up required</p>
-                </div>
-            </div>
+            <a href="/" class="back-btn">← Change Name</a>
         </div>
     </div>
 
     <script>
-        // Add interactive effects
+        // Display player name
         document.addEventListener('DOMContentLoaded', function() {
+            const playerName = localStorage.getItem('playerName') || 'Artist';
+            document.getElementById('userWelcome').textContent = `Welcome, ${playerName}!`;
+            
             const cards = document.querySelectorAll('.mode-card');
             
             cards.forEach((card, index) => {
@@ -166,7 +152,7 @@
                 card.addEventListener('click', function() {
                     this.style.transform = 'scale(0.95)';
                     setTimeout(() => {
-                        window.location.href = this === cards[0] ? '/singleplayer' : '/multiplayer';
+                        window.location.href = this.classList.contains('singleplayer') ? '/singleplayer' : '/multiplayer';
                     }, 150);
                 });
             });
