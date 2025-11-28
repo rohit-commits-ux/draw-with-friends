@@ -5,6 +5,211 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Multiplayer - Draw With Friends</title>
     <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        .sidebar {
+            width: 280px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .tools-panel {
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        .tool-section {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .tool-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .tool-section h4 {
+            margin-bottom: 12px;
+            color: #333;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .brush-sizes {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+        
+        .brush-size {
+            width: 32px;
+            height: 32px;
+            border: 2px solid #ddd;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            background: white;
+            transition: all 0.2s ease;
+        }
+        
+        .brush-size:hover {
+            border-color: #667eea;
+            transform: scale(1.1);
+        }
+        
+        .brush-size.active {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+        
+        .brush-preview {
+            background: #333;
+            border-radius: 50%;
+        }
+        
+        .color-palette {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+            margin-bottom: 12px;
+        }
+        
+        .color-swatch {
+            width: 28px;
+            height: 28px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .color-swatch:hover {
+            transform: scale(1.1);
+            border-color: #333;
+        }
+        
+        .color-swatch.active {
+            border-color: #333;
+            transform: scale(1.1);
+        }
+        
+        .tool-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .tool-btn {
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s ease;
+            border: 2px solid #e0e0e0;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .tool-btn:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+        
+        .tool-btn.active {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+        
+        .custom-color {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        
+        #customColorPicker {
+            width: 35px;
+            height: 35px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .action-btn {
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-clear {
+            background: #ff6b6b;
+            color: white;
+        }
+        
+        .btn-clear:hover {
+            background: #ff5252;
+        }
+        
+        .btn-save {
+            background: #51cf66;
+            color: white;
+        }
+        
+        .btn-save:hover {
+            background: #40c057;
+        }
+        
+        .users-panel, .chat-panel {
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        .chat-messages {
+            height: 150px;
+            max-height: 150px;
+        }
+        
+        .room-info-display {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(102, 126, 234, 0.9);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: bold;
+            z-index: 10;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -15,7 +220,7 @@
                 <div class="room-info">
                     <input type="text" id="roomIdInput" placeholder="Enter room ID" value="default-room">
                     <button id="joinRoomBtn" class="btn btn-primary">🎮 Join Room</button>
-                    <button id="createRoomBtn" class="btn btn-success">✨ Create New Room</button>
+                    <button id="createRoomBtn" class="btn btn-success">✨ Create Room</button>
                     <span id="userCount">👤 Users: 1</span>
                 </div>
             </div>
@@ -23,33 +228,95 @@
 
         <div class="multiplayer-container">
             <div class="sidebar">
+                <!-- Drawing Tools -->
                 <div class="tools-panel">
                     <h3>🎨 Drawing Tools</h3>
                     
-                    <div class="tool-group">
-                        <label>🖌️ Brush Size: <span id="brushSizeValue">5px</span></label>
-                        <input type="range" id="brushSize" min="1" max="50" value="5" class="slider">
-                    </div>
-                    
-                    <div class="tool-group">
-                        <label>🎨 Color:</label>
-                        <input type="color" id="colorPicker" value="#000000">
-                        <div class="color-presets">
-                            <div class="color-preset" style="background: #000000;" data-color="#000000"></div>
-                            <div class="color-preset" style="background: #ff0000;" data-color="#ff0000"></div>
-                            <div class="color-preset" style="background: #00ff00;" data-color="#00ff00"></div>
-                            <div class="color-preset" style="background: #0000ff;" data-color="#0000ff"></div>
-                            <div class="color-preset" style="background: #ffff00;" data-color="#ffff00"></div>
-                            <div class="color-preset" style="background: #ff00ff;" data-color="#ff00ff"></div>
+                    <!-- Brush Sizes -->
+                    <div class="tool-section">
+                        <h4>🖌️ Brush Size</h4>
+                        <div class="brush-sizes">
+                            <div class="brush-size active" data-size="2">
+                                <div class="brush-preview" style="width: 3px; height: 3px;"></div>
+                            </div>
+                            <div class="brush-size" data-size="5">
+                                <div class="brush-preview" style="width: 6px; height: 6px;"></div>
+                            </div>
+                            <div class="brush-size" data-size="10">
+                                <div class="brush-preview" style="width: 10px; height: 10px;"></div>
+                            </div>
+                            <div class="brush-size" data-size="15">
+                                <div class="brush-preview" style="width: 14px; height: 14px;"></div>
+                            </div>
+                            <div class="brush-size" data-size="20">
+                                <div class="brush-preview" style="width: 18px; height: 18px;"></div>
+                            </div>
+                            <div class="brush-size" data-size="30">
+                                <div class="brush-preview" style="width: 22px; height: 22px;"></div>
+                            </div>
                         </div>
                     </div>
-                    
-                    <div class="action-buttons">
-                        <button id="clearBtn" class="btn btn-danger">🧹 Clear Canvas</button>
-                        <button id="saveBtn" class="btn btn-success">💾 Save Drawing</button>
+
+                    <!-- Colors -->
+                    <div class="tool-section">
+                        <h4>🎨 Colors</h4>
+                        <div class="color-palette">
+                            <div class="color-swatch active" style="background: #000000;" data-color="#000000"></div>
+                            <div class="color-swatch" style="background: #ff0000;" data-color="#ff0000"></div>
+                            <div class="color-swatch" style="background: #00ff00;" data-color="#00ff00"></div>
+                            <div class="color-swatch" style="background: #0000ff;" data-color="#0000ff"></div>
+                            <div class="color-swatch" style="background: #ffff00;" data-color="#ffff00"></div>
+                            <div class="color-swatch" style="background: #ff00ff;" data-color="#ff00ff"></div>
+                            <div class="color-swatch" style="background: #00ffff;" data-color="#00ffff"></div>
+                            <div class="color-swatch" style="background: #ffffff; border: 2px solid #ccc;" data-color="#ffffff"></div>
+                            <div class="color-swatch" style="background: #ff9500;" data-color="#ff9500"></div>
+                            <div class="color-swatch" style="background: #8e44ad;" data-color="#8e44ad"></div>
+                            <div class="color-swatch" style="background: #e74c3c;" data-color="#e74c3c"></div>
+                            <div class="color-swatch" style="background: #2ecc71;" data-color="#2ecc71"></div>
+                        </div>
+                        <div class="custom-color">
+                            <input type="color" id="customColorPicker" value="#000000">
+                            <span style="font-size: 12px;">Custom</span>
+                        </div>
+                    </div>
+
+                    <!-- Tools -->
+                    <div class="tool-section">
+                        <h4>🛠️ Tools</h4>
+                        <div class="tool-buttons">
+                            <button class="tool-btn active" data-tool="brush">
+                                <span>✏️</span> Brush
+                            </button>
+                            <button class="tool-btn" data-tool="eraser">
+                                <span>🧽</span> Eraser
+                            </button>
+                            <button class="tool-btn" data-tool="line">
+                                <span>📏</span> Line
+                            </button>
+                            <button class="tool-btn" data-tool="rectangle">
+                                <span>⬜</span> Rectangle
+                            </button>
+                            <button class="tool-btn" data-tool="circle">
+                                <span>⭕</span> Circle
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="tool-section">
+                        <h4>⚡ Actions</h4>
+                        <div class="action-buttons">
+                            <button class="action-btn btn-clear" id="clearBtn">
+                                <span>🧹</span> Clear Canvas
+                            </button>
+                            <button class="action-btn btn-save" id="saveBtn">
+                                <span>💾</span> Save Drawing
+                            </button>
+                        </div>
                     </div>
                 </div>
 
+                <!-- Active Users -->
                 <div class="users-panel">
                     <h3>👥 Active Users <span id="usersCount">(1)</span></h3>
                     <ul id="usersList">
@@ -57,6 +324,7 @@
                     </ul>
                 </div>
 
+                <!-- Chat -->
                 <div class="chat-panel">
                     <h3>💬 Chat</h3>
                     <div id="chatMessages" class="chat-messages">
@@ -85,9 +353,74 @@
     <script src="assets/js/canvas.js"></script>
     <script src="assets/js/multiplayer.js"></script>
     <script>
-        // Additional multiplayer initialization
+        // Multiplayer tools initialization
         document.addEventListener('DOMContentLoaded', function() {
-            // Generate random room ID for create button
+            // Brush size selection
+            document.querySelectorAll('.brush-size').forEach(brush => {
+                brush.addEventListener('click', function() {
+                    document.querySelectorAll('.brush-size').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    const size = parseInt(this.getAttribute('data-size'));
+                    if (window.canvas) {
+                        window.canvas.brushSize = size;
+                        window.canvas.ctx.lineWidth = size;
+                    }
+                });
+            });
+            
+            // Color selection
+            document.querySelectorAll('.color-swatch').forEach(swatch => {
+                swatch.addEventListener('click', function() {
+                    document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+                    this.classList.add('active');
+                    const color = this.getAttribute('data-color');
+                    if (window.canvas) {
+                        window.canvas.color = color;
+                        window.canvas.ctx.strokeStyle = color;
+                        document.getElementById('customColorPicker').value = color;
+                    }
+                });
+            });
+            
+            // Custom color picker
+            document.getElementById('customColorPicker').addEventListener('input', function(e) {
+                const color = e.target.value;
+                if (window.canvas) {
+                    window.canvas.color = color;
+                    window.canvas.ctx.strokeStyle = color;
+                    document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+                }
+            });
+            
+            // Tool selection
+            document.querySelectorAll('[data-tool]').forEach(toolBtn => {
+                toolBtn.addEventListener('click', function() {
+                    document.querySelectorAll('[data-tool]').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    const tool = this.getAttribute('data-tool');
+                    if (window.canvas) {
+                        window.canvas.currentTool = tool;
+                        
+                        // Change cursor based on tool
+                        const canvas = document.getElementById('drawingCanvas');
+                        switch(tool) {
+                            case 'brush':
+                                canvas.style.cursor = 'crosshair';
+                                break;
+                            case 'eraser':
+                                canvas.style.cursor = 'cell';
+                                break;
+                            case 'line':
+                            case 'rectangle':
+                            case 'circle':
+                                canvas.style.cursor = 'crosshair';
+                                break;
+                        }
+                    }
+                });
+            });
+            
+            // Create room button
             document.getElementById('createRoomBtn').addEventListener('click', function() {
                 const randomId = Math.random().toString(36).substring(2, 8).toUpperCase();
                 document.getElementById('roomIdInput').value = randomId;
@@ -99,16 +432,12 @@
             // Chat functionality
             const chatInput = document.getElementById('chatInput');
             const sendBtn = document.getElementById('sendBtn');
-            const chatMessages = document.getElementById('chatMessages');
             
             function sendMessage() {
                 const message = chatInput.value.trim();
                 if (message && window.multiplayerManager) {
-                    window.multiplayerManager.socket.emit('chat-message', {
-                        roomId: window.multiplayerManager.roomId,
-                        message: message,
-                        username: 'You'
-                    });
+                    const playerName = localStorage.getItem('playerName') || 'Anonymous';
+                    window.multiplayerManager.sendChatMessage(message, playerName);
                     chatInput.value = '';
                 }
             }
@@ -119,22 +448,7 @@
                     sendMessage();
                 }
             });
-            
-            // Listen for chat messages
-            if (window.multiplayerManager) {
-                window.multiplayerManager.socket.on('chat-message', (data) => {
-                    const messageElement = document.createElement('div');
-                    messageElement.className = 'chat-message';
-                    messageElement.innerHTML = `
-                        <strong>${data.username}:</strong> ${data.message}
-                        <span class="message-time">${data.timestamp}</span>
-                    `;
-                    chatMessages.appendChild(messageElement);
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-                });
-            }
         });
     </script>
 </body>
-
 </html>
