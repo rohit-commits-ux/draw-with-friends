@@ -3,82 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Draw With Friends - Collaborative Drawing App</title>
+    <title>Login - Draw With Friends</title>
     <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .login-container h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .login-container p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .form-group {
+            text-align: left;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .login-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .guest-info {
+            margin-top: 20px;
+            color: #888;
+            font-size: 14px;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <header>
+        <div class="login-container">
             <h1>🎨 Draw With Friends</h1>
-            <p>Create amazing art together in real-time!</p>
-        </header>
-        
-        <div class="mode-selection">
-            <div class="mode-card" onclick="window.location.href='/singleplayer'">
-                <h2>🎯 Single Player</h2>
-                <p>Practice your drawing skills alone</p>
-                <div class="mode-features">
-                    <span>✓ Unlimited canvas</span>
-                    <span>✓ Multiple brushes</span>
-                    <span>✓ Save your work</span>
-                </div>
-            </div>
+            <p>Enter your name to start drawing</p>
             
-            <div class="mode-card" onclick="window.location.href='/multiplayer'">
-                <h2>👥 Multiplayer</h2>
-                <p>Draw with friends in real-time</p>
-                <div class="mode-features">
-                    <span>✓ Real-time sync</span>
-                    <span>✓ Multiple rooms</span>
-                    <span>✓ Chat with friends</span>
+            <form class="login-form" id="loginForm">
+                <div class="form-group">
+                    <label for="playerName">Your Name:</label>
+                    <input type="text" id="playerName" placeholder="Enter your name" required maxlength="20">
                 </div>
+                
+                <button type="submit" class="login-btn">Start Drawing →</button>
+            </form>
+            
+            <div class="guest-info">
+                ✨ No registration required - just enter a name and start creating!
             </div>
         </div>
-
-        <div class="features">
-            <h3>🚀 Amazing Features:</h3>
-            <div class="features-grid">
-                <div class="feature-item">
-                    <span class="feature-icon">🖌️</span>
-                    <h4>Multiple Brush Sizes</h4>
-                    <p>From fine lines to bold strokes</p>
-                </div>
-                <div class="feature-item">
-                    <span class="feature-icon">🎨</span>
-                    <h4>Color Palette</h4>
-                    <p>Choose from millions of colors</p>
-                </div>
-                <div class="feature-item">
-                    <span class="feature-icon">⚡</span>
-                    <h4>Real-time Sync</h4>
-                    <p>See others draw instantly</p>
-                </div>
-                <div class="feature-item">
-                    <span class="feature-icon">📱</span>
-                    <h4>Mobile Friendly</h4>
-                    <p>Works on all devices</p>
-                </div>
-            </div>
-        </div>
-
-        <footer>
-            <p>Built with ❤️ using Socket.io & HTML5 Canvas</p>
-        </footer>
     </div>
 
     <script>
-        // Add some interactive effects
-        document.addEventListener('DOMContentLoaded', function() {
-            const cards = document.querySelectorAll('.mode-card');
-            cards.forEach(card => {
-                card.addEventListener('mouseenter', function() {
-                    this.style.transform = 'translateY(-10px) scale(1.05)';
-                });
-                card.addEventListener('mouseleave', function() {
-                    this.style.transform = 'translateY(0) scale(1)';
-                });
-            });
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const playerName = document.getElementById('playerName').value.trim();
+            
+            if (playerName) {
+                // Store player name in localStorage
+                localStorage.setItem('playerName', playerName);
+                localStorage.setItem('playerId', Math.random().toString(36).substring(2, 15));
+                
+                // Redirect to mode selection
+                window.location.href = '/mode';
+            } else {
+                alert('Please enter your name!');
+            }
         });
+
+        // Auto-focus on input
+        document.getElementById('playerName').focus();
     </script>
 </body>
 </html>
