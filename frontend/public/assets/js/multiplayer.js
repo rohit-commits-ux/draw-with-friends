@@ -4,7 +4,7 @@ class MultiplayerManager {
         this.roomId = 'default-room';
         this.users = new Set();
         this.isConnected = false;
-        this.username = `User${Math.random().toString(36).substring(2, 8)}`;
+        this.username = localStorage.getItem('playerName') || 'Player';
         
         this.init();
     }
@@ -12,8 +12,7 @@ class MultiplayerManager {
     init() {
         this.setupSocketEvents();
         this.setupUIEvents();
-        this.joinRoom();
-        this.updateConnectionStatus();
+        this.joinRoom(); // Auto-join default room
     }
     
     setupSocketEvents() {
@@ -54,13 +53,13 @@ class MultiplayerManager {
         this.socket.on('user-joined', (userId) => {
             this.users.add(userId);
             this.updateUserList();
-            this.showSystemMessage(`User ${userId.substring(0, 8)} joined the room`);
+            this.showSystemMessage(`User joined the room`);
         });
         
         this.socket.on('user-left', (userId) => {
             this.users.delete(userId);
             this.updateUserList();
-            this.showSystemMessage(`User ${userId.substring(0, 8)} left the room`);
+            this.showSystemMessage(`User left the room`);
         });
         
         this.socket.on('room-stats', (data) => {
@@ -70,25 +69,35 @@ class MultiplayerManager {
         this.socket.on('chat-message', (data) => {
             this.displayChatMessage(data);
         });
-        
-        this.socket.on('error', (error) => {
-            console.error('Socket error:', error);
-            this.showSystemMessage(`Error: ${error.message}`, 'error');
-        });
     }
     
     setupUIEvents() {
         const joinRoomBtn = document.getElementById('joinRoomBtn');
         const roomIdInput = document.getElementById('roomIdInput');
+        const createRoomBtn = document.getElementById('createRoomBtn');
         const clearBtn = document.getElementById('clearBtn');
         const saveBtn = document.getElementById('saveBtn');
         
-        if (joinRoomBtn && roomIdInput) {
+        // Join room button
+        if (joinRoomBtn) {
             joinRoomBtn.addEventListener('click', () => {
                 this.roomId = roomIdInput.value.trim() || 'default-room';
                 this.joinRoom();
             });
-            
+        }
+        
+        // Create room button
+        if (createRoomBtn) {
+            createRoomBtn.addEventListener('click', () => {
+                const randomId = Math.random().toString(36).substring(2, 6).toUpperCase();
+                this.roomId = randomId;
+                roomIdInput.value = randomId;
+                this.joinRoom();
+            });
+        }
+        
+        // Enter key to join room
+        if (roomIdInput) {
             roomIdInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
                     this.roomId = roomIdInput.value.trim() || 'default-room';
@@ -97,43 +106,42 @@ class MultiplayerManager {
             });
         }
         
+        // Clear canvas
         if (clearBtn) {
             clearBtn.addEventListener('click', () => {
                 this.clearCanvas();
             });
         }
         
+        // Save drawing
         if (saveBtn) {
             saveBtn.addEventListener('click', () => {
                 this.saveDrawing();
             });
         }
-        
-        // Update room display
-        const roomDisplay = document.getElementById('currentRoom');
-        if (roomDisplay) {
-            roomDisplay.textContent = `Room: ${this.roomId}`;
-        }
     }
     
     joinRoom() {
         if (this.socket && this.roomId) {
+            console.log(`🎮 Joining room: ${this.roomId}`);
             this.socket.emit('join-room', this.roomId);
-            this.updateUserList();
             
-            // Update room display
-            const roomDisplay = document.getElementById('currentRoom');
-            if (roomDisplay) {
-                roomDisplay.textContent = `Room: ${this.roomId}`;
-            }
-            
-            const roomIdInput = document.getElementById('roomIdInput');
-            if (roomIdInput) {
-                roomIdInput.value = this.roomId;
-            }
-            
+            // Update UI
+            this.updateRoomDisplay();
             this.showSystemMessage(`Joined room: ${this.roomId}`);
-            console.log(`🎮 Joined room: ${this.roomId}`);
+        }
+    }
+    
+    updateRoomDisplay() {
+        const roomDisplay = document.getElementById('currentRoom');
+        const roomIdInput = document.getElementById('roomIdInput');
+        
+        if (roomDisplay) {
+            roomDisplay.textContent = `Room: ${this.roomId}`;
+        }
+        
+        if (roomIdInput) {
+            roomIdInput.value = this.roomId;
         }
     }
     
@@ -141,7 +149,8 @@ class MultiplayerManager {
         if (this.socket && this.isConnected) {
             this.socket.emit('drawing', {
                 ...data,
-                roomId: this.roomId
+                roomId: this.roomId,
+                tool: data.tool || 'pen'
             });
         }
     }
@@ -149,7 +158,9 @@ class MultiplayerManager {
     clearCanvas() {
         if (this.socket && this.isConnected) {
             this.socket.emit('clear-canvas', this.roomId);
-            this.showSystemMessage('Canvas cleared');
+        }
+        if (window.canvas) {
+            window.canvas.clearCanvas();
         }
     }
     
@@ -179,7 +190,7 @@ class MultiplayerManager {
             // Add other users
             this.users.forEach(userId => {
                 const userItem = document.createElement('li');
-                userItem.textContent = `User ${userId.substring(0, 8)}`;
+                userItem.textContent = `User`;
                 usersList.appendChild(userItem);
             });
         }
@@ -187,7 +198,7 @@ class MultiplayerManager {
         const totalUsers = this.users.size + 1; // +1 for current user
         
         if (userCount) {
-            userCount.textContent = `👤 Users: ${totalUsers}`;
+            userCount.textContent = `👤 ${totalUsers}`;
         }
         
         if (usersCount) {
@@ -198,7 +209,7 @@ class MultiplayerManager {
     updateRoomStats(data) {
         const userCount = document.getElementById('userCount');
         if (userCount && data.userCount !== undefined) {
-            userCount.textContent = `👤 Users: ${data.userCount}`;
+            userCount.textContent = `👤 ${data.userCount}`;
         }
     }
     
@@ -215,11 +226,11 @@ class MultiplayerManager {
         }
     }
     
-    showSystemMessage(message, type = 'info') {
+    showSystemMessage(message) {
         const chatMessages = document.getElementById('chatMessages');
         if (chatMessages) {
             const messageElement = document.createElement('div');
-            messageElement.className = `system-message ${type}`;
+            messageElement.className = 'system-message';
             messageElement.textContent = message;
             chatMessages.appendChild(messageElement);
             chatMessages.scrollTop = chatMessages.scrollHeight;
