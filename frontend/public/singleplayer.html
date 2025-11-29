@@ -42,29 +42,35 @@
             color: white;
         }
         
-        .brush-size {
-            width: 60px;
-            height: 40px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            background: white;
-            cursor: pointer;
+        .size-control {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            font-weight: bold;
-            transition: all 0.2s ease;
+            gap: 8px;
+            width: 100%;
         }
         
-        .brush-size:hover {
-            border-color: #667eea;
+        .size-slider {
+            width: 100%;
+            height: 6px;
+            background: #ddd;
+            border-radius: 3px;
+            outline: none;
         }
         
-        .brush-size.active {
-            border-color: #667eea;
+        .size-slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
             background: #667eea;
-            color: white;
+            cursor: pointer;
+        }
+        
+        .size-value {
+            font-size: 12px;
+            font-weight: bold;
+            color: #333;
         }
         
         .color-picker {
@@ -117,10 +123,11 @@
                 <button class="tool-btn" data-tool="eraser" title="Eraser">🧽</button>
                 <button class="tool-btn" data-tool="line" title="Line">📏</button>
 
-                <!-- Brush Size -->
-                <div class="brush-size active" data-size="3">3px</div>
-                <div class="brush-size" data-size="5">5px</div>
-                <div class="brush-size" data-size="8">8px</div>
+                <!-- Brush Size Slider -->
+                <div class="size-control">
+                    <input type="range" class="size-slider" id="sizeSlider" min="1" max="30" value="3">
+                    <div class="size-value" id="sizeValue">3px</div>
+                </div>
 
                 <!-- Color -->
                 <input type="color" class="color-picker" id="colorPicker" value="#000000">
@@ -150,15 +157,15 @@
                 });
             });
             
-            // Brush size selection
-            document.querySelectorAll('[data-size]').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    document.querySelectorAll('[data-size]').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    const size = parseInt(this.getAttribute('data-size'));
-                    window.canvas.brushSize = size;
-                    window.canvas.ctx.lineWidth = size;
-                });
+            // Brush size slider
+            const sizeSlider = document.getElementById('sizeSlider');
+            const sizeValue = document.getElementById('sizeValue');
+            
+            sizeSlider.addEventListener('input', function() {
+                const size = parseInt(this.value);
+                window.canvas.brushSize = size;
+                window.canvas.ctx.lineWidth = size;
+                sizeValue.textContent = size + 'px';
             });
             
             // Color picker
