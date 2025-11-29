@@ -10,8 +10,9 @@ class DrawingCanvas {
         this.historyIndex = -1;
         
         // Default settings
-        this.brushSize = 5;
+        this.brushSize = 3;
         this.color = '#000000';
+        this.currentTool = 'pen'; // pen, eraser, line
         
         this.init();
     }
@@ -19,7 +20,6 @@ class DrawingCanvas {
     init() {
         this.setupCanvas();
         this.setupEventListeners();
-        this.setupTools();
         this.resizeCanvas();
     }
     
@@ -50,67 +50,18 @@ class DrawingCanvas {
         
         // Window resize
         window.addEventListener('resize', this.resizeCanvas.bind(this));
-        
-        // Keyboard events for undo/redo
-        document.addEventListener('keydown', this.handleKeyboard.bind(this));
-    }
-    
-    setupTools() {
-        const brushSize = document.getElementById('brushSize');
-        const brushSizeValue = document.getElementById('brushSizeValue');
-        const colorPicker = document.getElementById('colorPicker');
-        const clearBtn = document.getElementById('clearBtn');
-        const undoBtn = document.getElementById('undoBtn');
-        
-        if (brushSize) {
-            brushSize.addEventListener('input', (e) => {
-                this.brushSize = parseInt(e.target.value);
-                this.ctx.lineWidth = this.brushSize;
-                if (brushSizeValue) {
-                    brushSizeValue.textContent = `${this.brushSize}px`;
-                }
-            });
-        }
-        
-        if (colorPicker) {
-            colorPicker.addEventListener('input', (e) => {
-                this.color = e.target.value;
-                this.ctx.strokeStyle = this.color;
-            });
-        }
-        
-        if (clearBtn) {
-            clearBtn.addEventListener('click', () => {
-                this.clearCanvas();
-                if (this.mode === 'multiplayer' && window.multiplayerManager) {
-                    window.multiplayerManager.clearCanvas();
-                }
-            });
-        }
-        
-        if (undoBtn) {
-            undoBtn.addEventListener('click', () => {
-                this.undo();
-            });
-        }
-        
-        // Color presets
-        document.querySelectorAll('.color-preset').forEach(preset => {
-            preset.addEventListener('click', () => {
-                const color = preset.getAttribute('data-color');
-                this.color = color;
-                this.ctx.strokeStyle = color;
-                if (colorPicker) {
-                    colorPicker.value = color;
-                }
-            });
-        });
     }
     
     startDrawing(e) {
         this.isDrawing = true;
         const pos = this.getMousePos(e);
         [this.lastX, this.lastY] = [pos.x, pos.y];
+        
+        // For line tool, we'll handle it differently
+        if (this.currentTool === 'line') {
+            this.startX = pos.x;
+            this.startY = pos.y;
+        }
         
         // Save state for undo
         this.saveState();
@@ -122,30 +73,75 @@ class DrawingCanvas {
         e.preventDefault();
         const pos = this.getMousePos(e);
         
-        this.ctx.beginPath();
-        this.ctx.moveTo(this.lastX, this.lastY);
-        this.ctx.lineTo(pos.x, pos.y);
-        this.ctx.stroke();
-        
-        // Emit drawing data in multiplayer mode
-        if (this.mode === 'multiplayer' && window.multiplayerManager) {
-            window.multiplayerManager.sendDrawing({
-                x: pos.x,
-                y: pos.y,
-                prevX: this.lastX,
-                prevY: this.lastY,
-                color: this.color,
-                brushSize: this.brushSize
-            });
+        if (this.currentTool === 'pen' || this.currentTool === 'eraser') {
+            // Handle pen and eraser (free drawing)
+            this.ctx.beginPath();
+            this.ctx.moveTo(this.lastX, this.lastY);
+            this.ctx.lineTo(pos.x, pos.y);
+            
+            if (this.currentTool === 'eraser') {
+                // Eraser - use white color and set composite operation
+                this.ctx.strokeStyle = '#ffffff';
+                this.ctx.globalCompositeOperation = 'destination-out';
+            } else {
+                // Pen - use selected color
+                this.ctx.strokeStyle = this.color;
+                this.ctx.globalCompositeOperation = 'source-over';
+            }
+            
+            this.ctx.stroke();
+            
+            // Emit drawing data in multiplayer mode
+            if (this.mode === 'multiplayer' && window.multiplayerManager) {
+                window.multiplayerManager.sendDrawing({
+                    x: pos.x,
+                    y: pos.y,
+                    prevX: this.lastX,
+                    prevY: this.lastY,
+                    color: this.currentTool === 'eraser' ? '#ffffff' : this.color,
+                    brushSize: this.brushSize,
+                    tool: this.currentTool
+                });
+            }
+            
+            [this.lastX, this.lastY] = [pos.x, pos.y];
         }
-        
-        [this.lastX, this.lastY] = [pos.x, pos.y];
     }
     
     stopDrawing() {
         if (this.isDrawing) {
             this.isDrawing = false;
+            
+            // Handle line tool completion
+            if (this.currentTool === 'line' && this.startX !== undefined) {
+                const pos = this.getMousePos(event);
+                this.drawLine(this.startX, this.startY, pos.x, pos.y);
+                
+                // Emit line data in multiplayer mode
+                if (this.mode === 'multiplayer' && window.multiplayerManager) {
+                    window.multiplayerManager.sendDrawing({
+                        tool: 'line',
+                        startX: this.startX,
+                        startY: this.startY,
+                        endX: pos.x,
+                        endY: pos.y,
+                        color: this.color,
+                        brushSize: this.brushSize
+                    });
+                }
+            }
+            
+            // Reset composite operation
+            this.ctx.globalCompositeOperation = 'source-over';
         }
+    }
+    
+    drawLine(startX, startY, endX, endY) {
+        this.ctx.beginPath();
+        this.ctx.moveTo(startX, startY);
+        this.ctx.lineTo(endX, endY);
+        this.ctx.strokeStyle = this.color;
+        this.ctx.stroke();
     }
     
     handleTouch(e) {
@@ -157,18 +153,6 @@ class DrawingCanvas {
                 clientY: touch.clientY
             });
             this.canvas.dispatchEvent(mouseEvent);
-        }
-    }
-    
-    handleKeyboard(e) {
-        if (e.ctrlKey || e.metaKey) {
-            if (e.key === 'z' && !e.shiftKey) {
-                e.preventDefault();
-                this.undo();
-            } else if (e.key === 'y' || (e.key === 'z' && e.shiftKey)) {
-                e.preventDefault();
-                this.redo();
-            }
         }
     }
     
@@ -218,7 +202,7 @@ class DrawingCanvas {
         this.historyIndex++;
         
         // Limit history size
-        if (this.drawingHistory.length > 50) {
+        if (this.drawingHistory.length > 20) {
             this.drawingHistory.shift();
             this.historyIndex--;
         }
@@ -245,18 +229,34 @@ class DrawingCanvas {
     drawReceived(data) {
         const originalColor = this.ctx.strokeStyle;
         const originalWidth = this.ctx.lineWidth;
+        const originalComposite = this.ctx.globalCompositeOperation;
         
-        this.ctx.strokeStyle = data.color;
-        this.ctx.lineWidth = data.brushSize;
-        
-        this.ctx.beginPath();
-        this.ctx.moveTo(data.prevX, data.prevY);
-        this.ctx.lineTo(data.x, data.y);
-        this.ctx.stroke();
+        if (data.tool === 'line') {
+            // Draw line
+            this.ctx.strokeStyle = data.color;
+            this.ctx.lineWidth = data.brushSize;
+            this.drawLine(data.startX, data.startY, data.endX, data.endY);
+        } else {
+            // Draw freehand (pen or eraser)
+            this.ctx.strokeStyle = data.color;
+            this.ctx.lineWidth = data.brushSize;
+            
+            if (data.tool === 'eraser') {
+                this.ctx.globalCompositeOperation = 'destination-out';
+            } else {
+                this.ctx.globalCompositeOperation = 'source-over';
+            }
+            
+            this.ctx.beginPath();
+            this.ctx.moveTo(data.prevX, data.prevY);
+            this.ctx.lineTo(data.x, data.y);
+            this.ctx.stroke();
+        }
         
         // Reset to current user's settings
         this.ctx.strokeStyle = originalColor;
         this.ctx.lineWidth = originalWidth;
+        this.ctx.globalCompositeOperation = originalComposite;
     }
     
     // Export drawing as image
