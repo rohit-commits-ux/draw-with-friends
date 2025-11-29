@@ -7,280 +7,252 @@
     <link rel="stylesheet" href="assets/css/style.css">
     <style>
         .tools-panel {
-            background: #f8f9ff;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            width: 250px;
-        }
-        
-        .tool-section {
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        
-        .tool-section h4 {
-            margin-bottom: 12px;
-            color: #333;
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .brush-sizes {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin-bottom: 15px;
-        }
-        
-        .brush-size {
-            width: 35px;
-            height: 35px;
-            border: 2px solid #ddd;
-            border-radius: 50%;
+            background: #2c3e50;
+            padding: 15px;
+            border-radius: 10px;
+            width: 80px;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            background: white;
-            transition: all 0.2s ease;
+            flex-direction: column;
+            gap: 10px;
         }
         
-        .brush-size:hover {
-            border-color: #667eea;
-            transform: scale(1.1);
-        }
-        
-        .brush-size.active {
-            border-color: #667eea;
-            background: #667eea;
-            color: white;
-        }
-        
-        .brush-preview {
-            background: #333;
-            border-radius: 50%;
-        }
-        
-        .color-palette {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 6px;
-            margin-bottom: 15px;
-        }
-        
-        .color-swatch {
-            width: 30px;
-            height: 30px;
-            border: 2px solid #ddd;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        
-        .color-swatch:hover {
-            transform: scale(1.1);
-            border-color: #333;
-        }
-        
-        .color-swatch.active {
-            border-color: #333;
-            transform: scale(1.1);
-        }
-        
-        .tool-buttons {
+        .tool-group {
             display: flex;
             flex-direction: column;
             gap: 8px;
         }
         
+        .tool-section {
+            padding-bottom: 15px;
+            border-bottom: 1px solid #34495e;
+            margin-bottom: 15px;
+        }
+        
+        .tool-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .tool-section-title {
+            color: #ecf0f1;
+            font-size: 12px;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+        
         .tool-btn {
-            padding: 12px;
+            width: 50px;
+            height: 50px;
             border: none;
             border-radius: 8px;
-            background: white;
+            background: #34495e;
+            color: white;
             cursor: pointer;
-            font-size: 14px;
-            transition: all 0.2s ease;
-            border: 2px solid #e0e0e0;
-            text-align: left;
+            font-size: 20px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            justify-content: center;
+            transition: all 0.2s ease;
         }
         
         .tool-btn:hover {
-            border-color: #667eea;
-            background: #f0f4ff;
+            background: #3498db;
+            transform: scale(1.1);
         }
         
         .tool-btn.active {
-            border-color: #667eea;
-            background: #667eea;
-            color: white;
+            background: #e74c3c;
+            transform: scale(1.1);
         }
         
-        .tool-btn i {
-            font-size: 16px;
+        .brush-size-btn {
+            width: 50px;
+            height: 30px;
+            border: 2px solid #34495e;
+            border-radius: 5px;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        
+        .brush-size-btn:hover {
+            border-color: #3498db;
+        }
+        
+        .brush-size-btn.active {
+            border-color: #e74c3c;
+            background: #e74c3c;
+        }
+        
+        .brush-preview {
+            background: #2c3e50;
+            border-radius: 50%;
+        }
+        
+        .color-btn {
+            width: 30px;
+            height: 30px;
+            border: 2px solid #34495e;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .color-btn:hover {
+            transform: scale(1.2);
+        }
+        
+        .color-btn.active {
+            border-color: white;
+            transform: scale(1.2);
+        }
+        
+        .action-btn {
+            width: 50px;
+            height: 40px;
+            border: none;
+            border-radius: 5px;
+            background: #e74c3c;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        
+        .action-btn:hover {
+            background: #c0392b;
+            transform: scale(1.05);
+        }
+        
+        .action-btn.save {
+            background: #27ae60;
+        }
+        
+        .action-btn.save:hover {
+            background: #219a52;
+        }
+        
+        .color-palette {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            align-items: center;
         }
         
         .custom-color {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 10px;
+            margin-top: 5px;
         }
         
         #customColorPicker {
-            width: 40px;
-            height: 40px;
+            width: 30px;
+            height: 30px;
             border: none;
-            border-radius: 4px;
+            border-radius: 50%;
             cursor: pointer;
-        }
-        
-        .canvas-overlay {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(102, 126, 234, 0.9);
-            color: white;
-            padding: 20px 30px;
-            border-radius: 10px;
-            text-align: center;
-            backdrop-filter: blur(10px);
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>🎯 Single Player Mode</h1>
+            <h1>🎯 Single Player</h1>
             <div class="header-controls">
-                <a href="/mode" class="back-btn">← Back to Mode Selection</a>
+                <a href="/mode" class="back-btn">← Back</a>
                 <div class="drawing-info">
-                    <span id="drawingStats">Brush: 5px | Color: #000000</span>
+                    <span id="drawingStats">Brush | Black</span>
                 </div>
             </div>
         </header>
 
         <div class="drawing-container">
             <div class="tools-panel">
+                <!-- Tools -->
+                <div class="tool-section">
+                    <div class="tool-section-title">Tools</div>
+                    <div class="tool-group">
+                        <button class="tool-btn active" data-tool="brush" title="Brush">✏️</button>
+                        <button class="tool-btn" data-tool="eraser" title="Eraser">🧽</button>
+                        <button class="tool-btn" data-tool="line" title="Line">📏</button>
+                        <button class="tool-btn" data-tool="rectangle" title="Rectangle">⬜</button>
+                        <button class="tool-btn" data-tool="circle" title="Circle">⭕</button>
+                    </div>
+                </div>
+
                 <!-- Brush Sizes -->
                 <div class="tool-section">
-                    <h4>🖌️ Brush Size</h4>
-                    <div class="brush-sizes">
-                        <div class="brush-size active" data-size="2">
-                            <div class="brush-preview" style="width: 4px; height: 4px;"></div>
-                        </div>
-                        <div class="brush-size" data-size="5">
+                    <div class="tool-section-title">Size</div>
+                    <div class="tool-group">
+                        <button class="brush-size-btn active" data-size="2" title="2px">
+                            <div class="brush-preview" style="width: 2px; height: 2px;"></div>
+                        </button>
+                        <button class="brush-size-btn" data-size="5" title="5px">
+                            <div class="brush-preview" style="width: 5px; height: 5px;"></div>
+                        </button>
+                        <button class="brush-size-btn" data-size="10" title="10px">
                             <div class="brush-preview" style="width: 8px; height: 8px;"></div>
-                        </div>
-                        <div class="brush-size" data-size="10">
+                        </button>
+                        <button class="brush-size-btn" data-size="15" title="15px">
                             <div class="brush-preview" style="width: 12px; height: 12px;"></div>
-                        </div>
-                        <div class="brush-size" data-size="15">
-                            <div class="brush-preview" style="width: 16px; height: 16px;"></div>
-                        </div>
-                        <div class="brush-size" data-size="20">
-                            <div class="brush-preview" style="width: 20px; height: 20px;"></div>
-                        </div>
-                        <div class="brush-size" data-size="30">
-                            <div class="brush-preview" style="width: 24px; height: 24px;"></div>
-                        </div>
+                        </button>
                     </div>
                 </div>
 
                 <!-- Colors -->
                 <div class="tool-section">
-                    <h4>🎨 Colors</h4>
+                    <div class="tool-section-title">Colors</div>
                     <div class="color-palette">
-                        <div class="color-swatch active" style="background: #000000;" data-color="#000000"></div>
-                        <div class="color-swatch" style="background: #ff0000;" data-color="#ff0000"></div>
-                        <div class="color-swatch" style="background: #00ff00;" data-color="#00ff00"></div>
-                        <div class="color-swatch" style="background: #0000ff;" data-color="#0000ff"></div>
-                        <div class="color-swatch" style="background: #ffff00;" data-color="#ffff00"></div>
-                        <div class="color-swatch" style="background: #ff00ff;" data-color="#ff00ff"></div>
-                        <div class="color-swatch" style="background: #00ffff;" data-color="#00ffff"></div>
-                        <div class="color-swatch" style="background: #ffffff; border: 2px solid #ccc;" data-color="#ffffff"></div>
-                        <div class="color-swatch" style="background: #ff9500;" data-color="#ff9500"></div>
-                        <div class="color-swatch" style="background: #8e44ad;" data-color="#8e44ad"></div>
-                        <div class="color-swatch" style="background: #e74c3c;" data-color="#e74c3c"></div>
-                        <div class="color-swatch" style="background: #2ecc71;" data-color="#2ecc71"></div>
-                    </div>
-                    <div class="custom-color">
-                        <input type="color" id="customColorPicker" value="#000000">
-                        <span>Custom Color</span>
-                    </div>
-                </div>
-
-                <!-- Tools -->
-                <div class="tool-section">
-                    <h4>🛠️ Tools</h4>
-                    <div class="tool-buttons">
-                        <button class="tool-btn active" data-tool="brush">
-                            <span>✏️</span> Brush
-                        </button>
-                        <button class="tool-btn" data-tool="eraser">
-                            <span>🧽</span> Eraser
-                        </button>
-                        <button class="tool-btn" data-tool="fill">
-                            <span>🪣</span> Fill
-                        </button>
-                        <button class="tool-btn" data-tool="line">
-                            <span>📏</span> Line
-                        </button>
-                        <button class="tool-btn" data-tool="rectangle">
-                            <span>⬜</span> Rectangle
-                        </button>
-                        <button class="tool-btn" data-tool="circle">
-                            <span>⭕</span> Circle
-                        </button>
+                        <button class="color-btn active" style="background: #000000;" data-color="#000000" title="Black"></button>
+                        <button class="color-btn" style="background: #ff0000;" data-color="#ff0000" title="Red"></button>
+                        <button class="color-btn" style="background: #0000ff;" data-color="#0000ff" title="Blue"></button>
+                        <button class="color-btn" style="background: #00ff00;" data-color="#00ff00" title="Green"></button>
+                        <button class="color-btn" style="background: #ffff00;" data-color="#ffff00" title="Yellow"></button>
+                        <button class="color-btn" style="background: #ff00ff;" data-color="#ff00ff" title="Pink"></button>
+                        <button class="color-btn" style="background: #ffffff; border-color: #bdc3c7;" data-color="#ffffff" title="White"></button>
+                        <div class="custom-color">
+                            <input type="color" id="customColorPicker" value="#000000" title="Custom Color">
+                        </div>
                     </div>
                 </div>
 
                 <!-- Actions -->
                 <div class="tool-section">
-                    <h4>⚡ Actions</h4>
-                    <div class="tool-buttons">
-                        <button class="tool-btn" id="clearBtn">
-                            <span>🧹</span> Clear Canvas
-                        </button>
-                        <button class="tool-btn" id="undoBtn">
-                            <span>↶</span> Undo
-                        </button>
-                        <button class="tool-btn" id="redoBtn">
-                            <span>↷</span> Redo
-                        </button>
-                        <button class="tool-btn" id="saveBtn">
-                            <span>💾</span> Save Drawing
-                        </button>
+                    <div class="tool-section-title">Actions</div>
+                    <div class="tool-group">
+                        <button class="action-btn" id="clearBtn" title="Clear">🧹</button>
+                        <button class="action-btn" id="undoBtn" title="Undo">↶</button>
+                        <button class="action-btn save" id="saveBtn" title="Save">💾</button>
                     </div>
                 </div>
             </div>
 
             <div class="canvas-wrapper">
                 <canvas id="drawingCanvas" width="800" height="600"></canvas>
-                <div class="canvas-overlay" id="canvasOverlay">
-                    <p>Start drawing here!</p>
-                </div>
             </div>
         </div>
     </div>
 
     <script src="assets/js/canvas.js"></script>
     <script>
-        // Initialize single player canvas
         document.addEventListener('DOMContentLoaded', function() {
             window.canvas = new DrawingCanvas('single');
             
+            // Tool selection
+            document.querySelectorAll('[data-tool]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('[data-tool]').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    window.canvas.currentTool = this.getAttribute('data-tool');
+                    updateStats();
+                });
+            });
+            
             // Brush size selection
-            document.querySelectorAll('.brush-size').forEach(brush => {
-                brush.addEventListener('click', function() {
-                    document.querySelectorAll('.brush-size').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('[data-size]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('[data-size]').forEach(b => b.classList.remove('active'));
                     this.classList.add('active');
                     const size = parseInt(this.getAttribute('data-size'));
                     window.canvas.brushSize = size;
@@ -290,9 +262,9 @@
             });
             
             // Color selection
-            document.querySelectorAll('.color-swatch').forEach(swatch => {
-                swatch.addEventListener('click', function() {
-                    document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('[data-color]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('[data-color]').forEach(b => b.classList.remove('active'));
                     this.classList.add('active');
                     const color = this.getAttribute('data-color');
                     window.canvas.color = color;
@@ -302,73 +274,42 @@
                 });
             });
             
-            // Custom color picker
+            // Custom color
             document.getElementById('customColorPicker').addEventListener('input', function(e) {
                 const color = e.target.value;
                 window.canvas.color = color;
                 window.canvas.ctx.strokeStyle = color;
-                document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+                document.querySelectorAll('[data-color]').forEach(b => b.classList.remove('active'));
                 updateStats();
             });
             
-            // Tool selection
-            document.querySelectorAll('[data-tool]').forEach(toolBtn => {
-                toolBtn.addEventListener('click', function() {
-                    document.querySelectorAll('[data-tool]').forEach(t => t.classList.remove('active'));
-                    this.classList.add('active');
-                    const tool = this.getAttribute('data-tool');
-                    window.canvas.currentTool = tool;
-                    
-                    // Change cursor based on tool
-                    const canvas = document.getElementById('drawingCanvas');
-                    switch(tool) {
-                        case 'brush':
-                            canvas.style.cursor = 'crosshair';
-                            break;
-                        case 'eraser':
-                            canvas.style.cursor = 'cell';
-                            break;
-                        case 'fill':
-                            canvas.style.cursor = 'grab';
-                            break;
-                        case 'line':
-                        case 'rectangle':
-                        case 'circle':
-                            canvas.style.cursor = 'crosshair';
-                            break;
-                    }
-                });
+            // Actions
+            document.getElementById('clearBtn').addEventListener('click', function() {
+                window.canvas.clearCanvas();
             });
             
-            // Update drawing stats
-            const updateStats = () => {
-                const stats = document.getElementById('drawingStats');
-                if (stats) {
-                    stats.textContent = `Brush: ${window.canvas.brushSize}px | Color: ${window.canvas.color}`;
-                }
-            };
+            document.getElementById('undoBtn').addEventListener('click', function() {
+                window.canvas.undo();
+            });
             
-            // Save drawing button
             document.getElementById('saveBtn').addEventListener('click', function() {
-                const canvas = document.getElementById('drawingCanvas');
                 const link = document.createElement('a');
                 link.download = `drawing-${new Date().getTime()}.png`;
-                link.href = canvas.toDataURL();
+                link.href = document.getElementById('drawingCanvas').toDataURL();
                 link.click();
-                alert('🎉 Drawing saved!');
             });
             
-            // Redo button
-            document.getElementById('redoBtn').addEventListener('click', function() {
-                window.canvas.redo();
-            });
-            
-            // Canvas overlay
-            const canvasOverlay = document.getElementById('canvasOverlay');
-            if (canvasOverlay) {
-                document.getElementById('drawingCanvas').addEventListener('mousedown', function() {
-                    canvasOverlay.style.display = 'none';
-                });
+            function updateStats() {
+                const stats = document.getElementById('drawingStats');
+                const toolNames = {
+                    'brush': 'Brush',
+                    'eraser': 'Eraser', 
+                    'line': 'Line',
+                    'rectangle': 'Rectangle',
+                    'circle': 'Circle'
+                };
+                const tool = toolNames[window.canvas.currentTool] || 'Brush';
+                stats.textContent = `${tool} | ${window.canvas.brushSize}px`;
             }
             
             updateStats();
