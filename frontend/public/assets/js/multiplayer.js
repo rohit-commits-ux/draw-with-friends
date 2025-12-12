@@ -12,7 +12,7 @@ class MultiplayerManager {
     init() {
         this.setupSocketEvents();
         this.setupUIEvents();
-        this.joinRoom(); // Auto-join default room
+        this.joinRoom();
     }
     
     setupSocketEvents() {
@@ -20,7 +20,7 @@ class MultiplayerManager {
             this.isConnected = true;
             this.updateConnectionStatus();
             console.log('✅ Connected to server');
-            this.joinRoom(); // Rejoin room on reconnect
+            this.joinRoom();
         });
         
         this.socket.on('disconnect', () => {
@@ -53,13 +53,13 @@ class MultiplayerManager {
         this.socket.on('user-joined', (userId) => {
             this.users.add(userId);
             this.updateUserList();
-            this.showSystemMessage(`User joined the room`);
+            this.showSystemMessage('👤 A player joined the room');
         });
         
         this.socket.on('user-left', (userId) => {
             this.users.delete(userId);
             this.updateUserList();
-            this.showSystemMessage(`User left the room`);
+            this.showSystemMessage('👤 A player left the room');
         });
         
         this.socket.on('room-stats', (data) => {
@@ -126,22 +126,17 @@ class MultiplayerManager {
             console.log(`🎮 Joining room: ${this.roomId}`);
             this.socket.emit('join-room', this.roomId);
             
+            // Clear users list for new room
+            this.users.clear();
+            this.updateUserList();
+            
             // Update UI
-            this.updateRoomDisplay();
-            this.showSystemMessage(`Joined room: ${this.roomId}`);
-        }
-    }
-    
-    updateRoomDisplay() {
-        const roomDisplay = document.getElementById('currentRoom');
-        const roomIdInput = document.getElementById('roomIdInput');
-        
-        if (roomDisplay) {
-            roomDisplay.textContent = `Room: ${this.roomId}`;
-        }
-        
-        if (roomIdInput) {
-            roomIdInput.value = this.roomId;
+            const roomDisplay = document.getElementById('currentRoom');
+            if (roomDisplay) {
+                roomDisplay.textContent = `Room: ${this.roomId}`;
+            }
+            
+            this.showSystemMessage(`🎮 Joined room: ${this.roomId}`);
         }
     }
     
@@ -150,7 +145,9 @@ class MultiplayerManager {
             this.socket.emit('drawing', {
                 ...data,
                 roomId: this.roomId,
-                tool: data.tool || 'pen'
+                tool: data.tool || 'pen',
+                color: data.color || '#000000',
+                brushSize: data.brushSize || 5
             });
         }
     }
@@ -162,6 +159,7 @@ class MultiplayerManager {
         if (window.canvas) {
             window.canvas.clearCanvas();
         }
+        this.showSystemMessage('🧹 Canvas cleared');
     }
     
     sendChatMessage(message) {
@@ -169,7 +167,8 @@ class MultiplayerManager {
             this.socket.emit('chat-message', {
                 roomId: this.roomId,
                 message: message.trim(),
-                username: this.username
+                username: this.username,
+                timestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
             });
         }
     }
@@ -184,18 +183,18 @@ class MultiplayerManager {
             
             // Add current user first
             const currentUserItem = document.createElement('li');
-            currentUserItem.innerHTML = `<strong>You (${this.username})</strong>`;
+            currentUserItem.innerHTML = `<strong>${this.username} (You)</strong>`;
             usersList.appendChild(currentUserItem);
             
             // Add other users
             this.users.forEach(userId => {
                 const userItem = document.createElement('li');
-                userItem.textContent = `User`;
+                userItem.textContent = `Player`;
                 usersList.appendChild(userItem);
             });
         }
         
-        const totalUsers = this.users.size + 1; // +1 for current user
+        const totalUsers = this.users.size + 1;
         
         if (userCount) {
             userCount.textContent = `👤 ${totalUsers}`;
@@ -231,7 +230,7 @@ class MultiplayerManager {
         if (chatMessages) {
             const messageElement = document.createElement('div');
             messageElement.className = 'system-message';
-            messageElement.textContent = message;
+            messageElement.innerHTML = `💬 ${message}`;
             chatMessages.appendChild(messageElement);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
@@ -257,7 +256,7 @@ class MultiplayerManager {
             link.download = `drawing-${this.roomId}-${new Date().getTime()}.png`;
             link.href = window.canvas.exportImage();
             link.click();
-            this.showSystemMessage('Drawing saved!');
+            this.showSystemMessage('💾 Drawing saved!');
         }
     }
 }
@@ -286,5 +285,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 sendMessage();
             }
         });
+        
+        // Focus on chat input when clicking chat panel
+        const chatPanel = document.querySelector('.chat-panel');
+        if (chatPanel) {
+            chatPanel.addEventListener('click', () => {
+                chatInput.focus();
+            });
+        }
+    }
+    
+    // Auto-focus on room input
+    const roomInput = document.getElementById('roomIdInput');
+    if (roomInput) {
+        setTimeout(() => roomInput.focus(), 500);
     }
 });
