@@ -52,23 +52,44 @@
         
         .size-slider {
             width: 100%;
-            height: 6px;
-            background: #ddd;
-            border-radius: 3px;
+            height: 8px;
+            background: linear-gradient(to right, #667eea 0%, #667eea 10%, #ddd 10%);
+            border-radius: 4px;
             outline: none;
+            -webkit-appearance: none;
         }
         
         .size-slider::-webkit-slider-thumb {
-            appearance: none;
+            -webkit-appearance: none;
             width: 20px;
             height: 20px;
             border-radius: 50%;
-            background: #667eea;
+            background: #e74c3c;
             cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .size-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #e74c3c;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .size-display {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            font-size: 10px;
+            color: #666;
         }
         
         .size-value {
-            font-size: 12px;
+            font-size: 14px;
             font-weight: bold;
             color: #333;
         }
@@ -122,11 +143,16 @@
                 <button class="tool-btn active" data-tool="pen" title="Pen">✏️</button>
                 <button class="tool-btn" data-tool="eraser" title="Eraser">🧽</button>
                 <button class="tool-btn" data-tool="line" title="Line">📏</button>
+                <button class="tool-btn" data-tool="fill" title="Fill Bucket">🪣</button>
 
                 <!-- Brush Size Slider -->
                 <div class="size-control">
-                    <input type="range" class="size-slider" id="sizeSlider" min="1" max="30" value="3">
-                    <div class="size-value" id="sizeValue">3px</div>
+                    <input type="range" class="size-slider" id="sizeSlider" min="1" max="30" value="5">
+                    <div class="size-display">
+                        <span>1</span>
+                        <span>30</span>
+                    </div>
+                    <div class="size-value" id="sizeValue">5px</div>
                 </div>
 
                 <!-- Color -->
@@ -154,6 +180,12 @@
                     document.querySelectorAll('[data-tool]').forEach(b => b.classList.remove('active'));
                     this.classList.add('active');
                     window.canvas.currentTool = this.getAttribute('data-tool');
+                    
+                    // Change cursor based on tool
+                    const canvas = document.getElementById('drawingCanvas');
+                    if (this.getAttribute('data-tool') === 'fill') {
+                        canvas.style.cursor = 'crosshair';
+                    }
                 });
             });
             
@@ -161,12 +193,24 @@
             const sizeSlider = document.getElementById('sizeSlider');
             const sizeValue = document.getElementById('sizeValue');
             
+            function updateSliderVisual() {
+                const value = sizeSlider.value;
+                const min = sizeSlider.min;
+                const max = sizeSlider.max;
+                const percent = ((value - min) / (max - min)) * 100;
+                sizeSlider.style.background = `linear-gradient(to right, #667eea 0%, #667eea ${percent}%, #ddd ${percent}%)`;
+            }
+            
             sizeSlider.addEventListener('input', function() {
                 const size = parseInt(this.value);
                 window.canvas.brushSize = size;
                 window.canvas.ctx.lineWidth = size;
                 sizeValue.textContent = size + 'px';
+                updateSliderVisual();
             });
+            
+            // Initialize slider visual
+            updateSliderVisual();
             
             // Color picker
             document.getElementById('colorPicker').addEventListener('input', function(e) {
